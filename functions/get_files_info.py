@@ -8,7 +8,7 @@ schema_get_files_info = types.FunctionDeclaration(
         properties={
             "directory": types.Schema(
                 type=types.Type.STRING,
-                description="Directory path to list files from, relative to the working directory (default is the working directory itself)",
+                description="The directory path to list files from, relative to the working directory (default is the working directory itself)",
             ),
         },
     ),
@@ -22,17 +22,12 @@ def get_files_info(working_directory, directory="."):
     try:
         # Get the absolute path of the working directory
         working_directory_abs = os.path.abspath(working_directory)
-        
-        #print(f"Working directory absolute path: {working_directory_abs}")
 
         # full path of the target directory
-        #print(f"directory: {directory}")
         target_dir = os.path.normpath(os.path.join(working_directory_abs, directory))
-        #print(f"target_dir: {target_dir}")
 
         # Will be True or False
         valid_target_dir = os.path.commonpath([working_directory_abs, target_dir]) == working_directory_abs
-        #print(f"valid_target_dir: {valid_target_dir}")
 
         if not valid_target_dir:
             raise ValueError(f"Error: Target directory {target_dir} is outside the permitted working directory")

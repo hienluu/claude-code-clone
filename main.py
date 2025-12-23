@@ -9,13 +9,12 @@ from functions.call_function import available_functions
 from functions.call_function import call_function
 
 
-load_dotenv()
-api_key = os.getenv("GEMINI_API_KEY")
-gemini_model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-
-MAX_ITERATIONS = 20
+MAX_ITERATIONS = 10
 
 def main():
+    load_dotenv()
+    api_key = os.getenv("GEMINI_API_KEY")
+    gemini_model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
     
     if not api_key:
         raise Exception("GEMINI_API_KEY not found in environment variables.")
@@ -46,11 +45,12 @@ def main():
     iteration = 0
     while iteration < MAX_ITERATIONS:
         try:
+            client_config = types.GenerateContentConfig(system_instruction=system_prompt,
+                                                    tools=[available_functions])
             response = client.models.generate_content(
                 model=gemini_model,
                 contents=messages,
-                config=types.GenerateContentConfig(system_instruction=system_prompt,
-                                                    tools=[available_functions])                                      
+                config=client_config
             )
             
             if verbose:
@@ -66,31 +66,37 @@ def main():
                 print(f"Final Response:\n {response.text}")
                 break  # exit loop if no function calls
             
-            if verbose:
+            
+            # looping through response.candidaates
+            if response.candidates:
                 for candidate in response.candidates:
-                    print(f"Candidate content: {candidate.content}")
+                    if verbose:
+                        print(f"Candidate content: {candidate.content.parts[0].text}")
+                    messages.append(candidate.content)
             
             function_call_response = []
             print("-" * 100)
             if response.function_calls:
                 for function_call in response.function_calls:                
                     function_response_content = call_function(function_call, verbose=verbose)
-                    if function_response_content.parts[0].function_response.response:
-                        function_call_response.append(function_response_content.parts[0])
-                        function_response_text = function_response_content.parts[0].function_response.response['result']
-                        if verbose:
-                            print(f"-> {function_response_text}")
-                        messages.append(types.Content(role="user", parts=[types.Part(text=function_response_text)]))
-                    else:
-                        raise Exception(f"Function {function_call.name}({function_call.args}) call failed.")
+                    messages.append(function_response_content)
+                    
+                    #if function_response_content.parts[0].function_response.response:
+                     #   function_call_response.append(function_response_content.parts[0])
+                      #  function_response_text = function_response_content.parts[0].function_response.response['result']
+                    #    if verbose:
+                    #        print(f"-> {function_response_text}")
+                    #    messages.append(types.Content(role="user", parts=[types.Part(text=function_response_text)]))
+                    #else:
+                    #    raise Exception(f"Function {function_call.name}({function_call.args}) call failed.")
             else:
-                if verbose:
-                    print(f"Response from Gemini API: {response.text}")
+                print(f"Final response: {response.text}")
+                return
                 
             iteration += 1
-         
-            print(f"Iteration: {iteration}")
-            #print("=" * 100)
+            if verbose:
+                print(f"Iteration: {iteration}")
+            
         except Exception as e:
             e.print_stack()
             print(f"An error occurred: {e}")
