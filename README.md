@@ -15,3 +15,7 @@ This is a simple AI coding agent that uses Gemini as the LLM and it has access t
 ### Resources
 * This is based on the course [Build an AI Agent in Python on boot.dev](https://www.boot.dev/courses/build-ai-agent-python)
 * Youtube video: [Guide to Agentic AI – Build a Python Coding Agent with Gemini](https://www.youtube.com/watch?v=YtHdaXuOAks)
+
+
+#### Git Notes
+* git push -u origin main
