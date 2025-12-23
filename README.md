@@ -1,5 +1,5 @@
 ## Claude Code Clone AI agent
-This is a simple AI coding agent that uses Gemini as the LLM and it has access to 4 tools, which are defined in the function directory.  
+This is a simple AI coding agent that uses Gemini as the LLM and it has access to 4 tools, which are defined in the function directory.  This simple agent uses a simple loop and it doesn't use any agent framework.
 
 
 ### Getting started
