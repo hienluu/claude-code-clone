@@ -16,9 +16,9 @@ The agent operates on a linear execution loop:
 * Iteration: This process repeats until the task is complete or a predefined maximum iteration limit is reached to prevent infinite loops and token exhaustion.
 
 ### Getting started
-* make a copy of .env.sample and name if .env
-* populate your GEMINI_API_KEY
-* Warning: as you try to test this out, you might run in the Gemini rate limiting, unless you've set up a paid tier with your credit card.
+* Make a copy of .env.sample and name if .env
+* Fill in your GEMINI_API_KEY
+* Warning: as you test this out, you might run in Gemini rate limiting with free tier. It is easy to set up a paid tier with your credit card. It costs me only about $1 dollar for all the testings that happened during the development of this agent
 
 ### Example prompts
 * uv run main.py "tell me about the calculator's capabilities"
