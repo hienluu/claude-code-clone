@@ -9,7 +9,7 @@ from functions.call_function import available_functions
 from functions.call_function import call_function
 
 
-MAX_ITERATIONS = 10
+MAX_ITERATIONS = 20
 
 def main():
     load_dotenv()
@@ -69,9 +69,8 @@ def main():
             
             # looping through response.candidaates
             if response.candidates:
-                for candidate in response.candidates:
-                    if verbose:
-                        print(f"Candidate content: {candidate.content.parts[0].text}")
+                for candidate in response.candidates:                    
+                    print(f"Candidate content ({candidate.content.role}): {candidate.content.parts[0].text}")
                     messages.append(candidate.content)
             
             function_call_response = []
@@ -79,6 +78,8 @@ def main():
             if response.function_calls:
                 for function_call in response.function_calls:                
                     function_response_content = call_function(function_call, verbose=verbose)
+                    if verbose:
+                        print(f"call_function response: {function_response_content}")
                     messages.append(function_response_content)
                     
                     #if function_response_content.parts[0].function_response.response:
@@ -95,7 +96,7 @@ def main():
                 
             iteration += 1
             if verbose:
-                print(f"Iteration: {iteration}")
+                print(f"Iteration: {iteration}\n")
             
         except Exception as e:
             e.print_stack()
