@@ -1,15 +1,15 @@
 ## Claude Code Clone AI agent
-🤖 Simple AI Coding Agent
+### 🤖 Simple AI Coding Agent
 A lightweight, framework-free AI agent built from scratch using the Gemini API. This project demonstrates how to implement an autonomous agent loop and tool-calling logic without external agentic libraries.
 
-🛠 Core Capabilities
+### 🛠 Core Capabilities
 The agent interacts with the local environment through a suite of four specialized file-system tools:
 * Read Content: Retrieves the full text content of a specified file.
 * Inspect Metadata: Fetches file information (e.g., size, path, existence).
 * Execute Code: Runs Python files directly and captures the output/errors.
 * Write/Update: Creates new files or overwrites existing ones with generated code.
 
-🔄 Logic & Execution
+### 🔄 Logic & Execution
 The agent operates on a linear execution loop:
 * Reasoning: The agent analyzes the task and decides which tool to use.
 * Action: The tool is invoked, and the result is returned as an "observation."
