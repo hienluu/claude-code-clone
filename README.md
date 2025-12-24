@@ -7,7 +7,7 @@ The agent interacts with the local environment through a suite of four specializ
 * Read Content: Retrieves the full text content of a specified file.
 * Inspect Metadata: Fetches file information (e.g., size, path, existence).
 * Execute Code: Runs Python files directly and captures the output/errors.
-* Write/Update: Creates new files or overwrites existing ones with generated code.
+* Write: Overwrites existing ones with generated code.
 
 ### 🔄 Logic & Execution
 The agent operates on a linear execution loop:
