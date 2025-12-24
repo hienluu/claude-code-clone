@@ -29,8 +29,8 @@ The agent operates on a linear execution loop:
 * uv run main.py "what's in file pkg/render.py?"
 * uv run main.py "what's in file tests.py?"
 
-#### here is a cool test
-* Manually update calculator/pkg/calculator.py and change the precedence of the + operator to 3
+#### Here is a cool test to ask this agent to fix a bug
+* Manually update calculator/pkg/calculator.py and change the precedence of the + operator to 3 (from 1)
 * Run the calculator app, to make sure it's now producing incorrect results: 
   * uv run calculator/main.py "3 + 7 * 2" 
   * (this should be 17, but because we broke it, it says 20)
