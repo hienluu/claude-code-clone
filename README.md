@@ -41,7 +41,8 @@ The agent operates on a linear execution loop:
 ### Resources
 * This is based on the course [Build an AI Agent in Python on boot.dev](https://www.boot.dev/courses/build-ai-agent-python)
 * Youtube video: [Guide to Agentic AI – Build a Python Coding Agent with Gemini](https://www.youtube.com/watch?v=YtHdaXuOAks)
-
+* [How AI Agents Actually Work - Explained in One Python File](https://www.youtube.com/watch?v=Q3Gb7Rjre3U)
+* [Single-File AI Agent Tutorial](https://github.com/daveebbelaar/single-file-ai-agent-tutorial/tree/master)
 
 #### Git Notes
 * git push -u origin main
