@@ -1,5 +1,6 @@
 from google.genai import types
 
+
 schema_get_file_content = types.FunctionDeclaration(
     name="get_file_content",
     description="Get the content of a files in a specified directory relative to the working directory",
@@ -16,7 +17,16 @@ schema_get_file_content = types.FunctionDeclaration(
     
 )
 
-def get_file_content(working_directory, file_path):
+def get_file_content(working_directory : str, file_path: str) -> str:
+    """Get the content of a files in a specified directory relative to the working directory.
+    
+    Args:
+        working_directory (string): The working directory
+        file_path (string): the file in the working directory
+
+    Returns:
+        string: The content of the file specified by the file_path parameter
+    """
     import os
 
     try:

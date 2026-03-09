@@ -22,8 +22,10 @@ schema_run_python_file = types.FunctionDeclaration(
     
 )
 
-def run_python_file(working_directory, file_path, args=None):
-    
+def run_python_file(working_directory:str, file_path:str, args:str) -> str:
+    """
+    Run a Python file in a specified directory relative to the working directory
+    """
 
     # Get the absolute path of the working directory
     working_directory_abs = os.path.abspath(working_directory)

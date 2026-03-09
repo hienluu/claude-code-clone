@@ -16,7 +16,7 @@ def call_function(function_call: types.FunctionCall, verbose=False) -> types.Con
     if verbose:
         print(f"Calling function: {function_name}({function_args})")
     else:
-        print(f" - Calling function: {function_name}({function_args})")
+        print(f" - Calling function: {function_name}")
 
     # Dictionary mapping function names to their implementations
     def _get_files_info():

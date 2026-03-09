@@ -20,7 +20,10 @@ schema_write_file = types.FunctionDeclaration(
    
 )
 
-def write_file(working_directory, file_path, content):
+def write_file(working_directory:str, file_path:str, content:str) -> str:
+    """
+    Write content to a file in a specified directory relative to the working directory
+    """
     import os
 
     try:

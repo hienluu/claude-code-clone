@@ -1,6 +1,10 @@
 import os
 import argparse
+
+from typing import List
+
 from google import genai
+from google.genai import Client
 from google.genai import types
 from dotenv import load_dotenv
 
@@ -11,44 +15,14 @@ from functions.call_function import call_function
 
 MAX_ITERATIONS = 20
 
-def main():
-    load_dotenv()
-    api_key = os.getenv("GEMINI_API_KEY")
-    gemini_model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-    
-    if not api_key:
-        raise Exception("GEMINI_API_KEY not found in environment variables.")
-
-    if not gemini_model:
-        raise Exception("GEMINI_MODEL not found in environment variables.")
-  
-  
-
-    parser = argparse.ArgumentParser(description="Chatbot")
-    parser.add_argument("user_prompt", help="User prompt")
-    parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
-    
-    args = parser.parse_args()
-    user_prompt = args.user_prompt
-    verbose = args.verbose
-    
-    if verbose:
-        print("Hello from claude-code-clone!")
-        print("API Key loaded successfully.")
-        print(f"Using Gemini model: {gemini_model}")    
-    
-    messages = [types.Content(role="user", parts=[types.Part(text=user_prompt)])]
-
-    client = genai.Client(api_key=api_key)
-    ##client.models.list()
-    
+def agentic_loop(client: Client, model: str, user_prompt: str, messages:List[str], verbose: bool):
     iteration = 0
     while iteration < MAX_ITERATIONS:
         try:
             client_config = types.GenerateContentConfig(system_instruction=system_prompt,
                                                     tools=[available_functions])
             response = client.models.generate_content(
-                model=gemini_model,
+                model=model,
                 contents=messages,
                 config=client_config
             )
@@ -63,10 +37,8 @@ def main():
             # determine if there are function calls in the response
             if not response.function_calls and response:
                 # print the response and exit the loop
-                print(f"Final Response:\n {response.text}")
-                break  # exit loop if no function calls
-            
-            
+                return f"Final Response:\n {response.text}"                
+                    
             # looping through response.candidaates
             if response.candidates:
                 for candidate in response.candidates:                    
@@ -80,16 +52,7 @@ def main():
                     function_response_content = call_function(function_call, verbose=verbose)
                     if verbose:
                         print(f"call_function response: {function_response_content}")
-                    messages.append(function_response_content)
-                    
-                    #if function_response_content.parts[0].function_response.response:
-                     #   function_call_response.append(function_response_content.parts[0])
-                      #  function_response_text = function_response_content.parts[0].function_response.response['result']
-                    #    if verbose:
-                    #        print(f"-> {function_response_text}")
-                    #    messages.append(types.Content(role="user", parts=[types.Part(text=function_response_text)]))
-                    #else:
-                    #    raise Exception(f"Function {function_call.name}({function_call.args}) call failed.")
+                    messages.append(function_response_content)                    
             else:
                 print(f"Final response: {response.text}")
                 return
@@ -100,9 +63,68 @@ def main():
             
         except Exception as e:
             e.print_stack()
-            print(f"An error occurred: {e}")
-            break
-        
+            return f"An error occurred: {e}"
+            
 
+def main():
+    load_dotenv()
+    api_key = os.getenv("GEMINI_API_KEY")
+    gemini_model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+    
+    if not api_key:
+        raise Exception("GEMINI_API_KEY not found in environment variables.")
+
+    if not gemini_model:
+        raise Exception("GEMINI_MODEL not found in environment variables.")
+
+    print("---" * 30)
+    print(f"Starting agent with model: {gemini_model}")
+    print("---" * 30)
+
+    parser = argparse.ArgumentParser(description="Chatbot")
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
+    
+    args = parser.parse_args()
+    user_prompt = args.user_prompt
+    verbose = args.verbose
+    
+    if verbose:
+        print("Hello from claude-code-clone!")
+        print("API Key loaded successfully.")
+        print(f"Using Gemini model: {gemini_model}")    
+    
+    # instantia gemini client
+    client = genai.Client(api_key=api_key)
+    if verbose:
+        print(f"{client.models.list()}")
+        
+    messages = []
+    while True:
+        user_prompt = input("[user]: ")
+        
+        user_prompt_lowercase = user_prompt.lower()
+        if user_prompt_lowercase == "/exit":
+            print("[agent] Goodbye!")
+            break
+        elif user_prompt_lowercase == "/clear":
+            messages = []
+            continue
+        elif user_prompt_lowercase == "/help":
+            print("/bye to exit the loop")
+            print("\n")
+            continue
+            
+        # perform action
+        print(f"action: {user_prompt}")
+        messages.append(types.Content(role="user", parts=[types.Part(text=user_prompt)]))        
+    
+        # go into agentic loop
+        agent_response = agentic_loop(client, gemini_model, user_prompt, messages, verbose)        
+        
+        # print agent out
+        print(f"[agent] {agent_response}")
+        print("-" * 40)
+            
+        
 if __name__ == "__main__":
     main()
