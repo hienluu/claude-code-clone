@@ -30,9 +30,7 @@ def agentic_loop(client: Client, model: str, user_prompt: str, messages:List[str
                 config=client_config
             )
             
-            if verbose:
-                print(f"User prompt: {user_prompt}")
-                print(f"Response from Gemini API: {response}")
+            if verbose:                
                 print("=" * 100)
                 print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
                 print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
@@ -75,19 +73,8 @@ def agentic_loop(client: Client, model: str, user_prompt: str, messages:List[str
             
 
 def print_banner():
-    console = Console()
-    # ASCII Art string
-    banner_text = """
-       ________                __         ______            __      ______                      
-      / ____/ /___ ___  ______/ /__      / ____/___  ____  / /__   / ____/___  ____/ /__        
-     / /   / / __ `/ / / / __  / _ \    / /   / __ \/ __ \/ / _ \ / /   / __ \/ __  / _ \       
-    / /___/ / /_/ / /_/ / /_/ /  __/   / /___/ /_/ / /_/ / /  __// /___/ /_/ / /_/ /  __/       
-    \____/_/\__,_/\__,_/\__,_/\___/    \____/\____/\____/_/\___/ \____/\____/\__,_/\___/        
-    """
-
-    # Rich makes it easy to style the whole block with a gradient-like border
-    console.print(banner_text, style="bold color(27)") # Deep Blue
-    console.print(Panel("[bold magenta]Claude Code Clone[/bold magenta] v1.0.0", expand=False))
+    from banner import print_banner
+    print_banner()
 
 def main():
     load_dotenv()
