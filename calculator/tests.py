@@ -44,6 +44,22 @@ class TestCalculator(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.calculator.evaluate("+ 3")
 
+    def test_parentheses_basic(self):
+        result = self.calculator.evaluate("3 + (7 * 2)")
+        self.assertEqual(result, 17)
+
+    def test_parentheses_override_precedence(self):
+        result = self.calculator.evaluate("(3 + 7) * 2")
+        self.assertEqual(result, 20)
+
+    def test_parentheses_nested(self):
+        result = self.calculator.evaluate("(2 + 3) * (4 - 1)")
+        self.assertEqual(result, 15)
+
+    def test_parentheses_no_spaces(self):
+        result = self.calculator.evaluate("(3+7)*2")
+        self.assertEqual(result, 20)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -8,6 +8,9 @@ from google.genai import Client
 from google.genai import types
 from dotenv import load_dotenv
 
+from rich.console import Console
+from rich.panel import Panel
+
 from prompts import system_prompt
 from functions.call_function import available_functions
 from functions.call_function import call_function
@@ -17,10 +20,10 @@ MAX_ITERATIONS = 20
 
 def agentic_loop(client: Client, model: str, user_prompt: str, messages:List[str], verbose: bool):
     iteration = 0
+    client_config = types.GenerateContentConfig(system_instruction=system_prompt,
+                                                tools=[available_functions])
     while iteration < MAX_ITERATIONS:
         try:
-            client_config = types.GenerateContentConfig(system_instruction=system_prompt,
-                                                    tools=[available_functions])
             response = client.models.generate_content(
                 model=model,
                 contents=messages,
@@ -41,17 +44,22 @@ def agentic_loop(client: Client, model: str, user_prompt: str, messages:List[str
                     
             # looping through response.candidaates
             if response.candidates:
-                for candidate in response.candidates:                    
-                    print(f"Candidate content ({candidate.content.role}): {candidate.content.parts[0].text}")
+                if verbose:
+                    print ("### response.candidates")
+                for i, candidate in enumerate(response.candidates): 
+                    if verbose:
+                        print(f"Response candidate content[{i}] ({candidate.content.role}): {candidate.content.parts[0].text} - {candidate.content}")
                     messages.append(candidate.content)
             
             function_call_response = []
             print("-" * 100)
             if response.function_calls:
-                for function_call in response.function_calls:                
+                for i, function_call in enumerate(response.function_calls): 
+                    if verbose:
+                        print(f"function_call content[{i}] {function_call}")
                     function_response_content = call_function(function_call, verbose=verbose)
                     if verbose:
-                        print(f"call_function response: {function_response_content}")
+                        print(f"call_function response[{i}]: {function_response_content}")
                     messages.append(function_response_content)                    
             else:
                 print(f"Final response: {response.text}")
@@ -59,12 +67,27 @@ def agentic_loop(client: Client, model: str, user_prompt: str, messages:List[str
                 
             iteration += 1
             if verbose:
-                print(f"Iteration: {iteration}\n")
+                print(f"------  Iteration: {iteration}\n")
             
         except Exception as e:
             e.print_stack()
             return f"An error occurred: {e}"
             
+
+def print_banner():
+    console = Console()
+    # ASCII Art string
+    banner_text = """
+       ________                __         ______            __      ______                      
+      / ____/ /___ ___  ______/ /__      / ____/___  ____  / /__   / ____/___  ____/ /__        
+     / /   / / __ `/ / / / __  / _ \    / /   / __ \/ __ \/ / _ \ / /   / __ \/ __  / _ \       
+    / /___/ / /_/ / /_/ / /_/ /  __/   / /___/ /_/ / /_/ / /  __// /___/ /_/ / /_/ /  __/       
+    \____/_/\__,_/\__,_/\__,_/\___/    \____/\____/\____/_/\___/ \____/\____/\__,_/\___/        
+    """
+
+    # Rich makes it easy to style the whole block with a gradient-like border
+    console.print(banner_text, style="bold color(27)") # Deep Blue
+    console.print(Panel("[bold magenta]Claude Code Clone[/bold magenta] v1.0.0", expand=False))
 
 def main():
     load_dotenv()
@@ -77,6 +100,8 @@ def main():
     if not gemini_model:
         raise Exception("GEMINI_MODEL not found in environment variables.")
 
+    print_banner()
+
     print("---" * 30)
     print(f"Starting agent with model: {gemini_model}")
     print("---" * 30)
@@ -84,33 +109,33 @@ def main():
     parser = argparse.ArgumentParser(description="Chatbot")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
     
+    
     args = parser.parse_args()
-    user_prompt = args.user_prompt
     verbose = args.verbose
     
     if verbose:
         print("Hello from claude-code-clone!")
         print("API Key loaded successfully.")
-        print(f"Using Gemini model: {gemini_model}")    
+        print(f"Configured model: {gemini_model}")    
     
     # instantia gemini client
     client = genai.Client(api_key=api_key)
     if verbose:
-        print(f"{client.models.list()}")
+        print(f"client model list: {type(client.models.list())}")
         
     messages = []
     while True:
         user_prompt = input("[user]: ")
         
         user_prompt_lowercase = user_prompt.lower()
-        if user_prompt_lowercase == "/exit":
+        if user_prompt_lowercase == "/exit" or user_prompt_lowercase == "/bye":
             print("[agent] Goodbye!")
             break
         elif user_prompt_lowercase == "/clear":
             messages = []
             continue
         elif user_prompt_lowercase == "/help":
-            print("/bye to exit the loop")
+            print("[agent] no help for")
             print("\n")
             continue
             

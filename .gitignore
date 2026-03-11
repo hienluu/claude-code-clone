@@ -1,6 +1,7 @@
 # Python-generated files
 __pycache__/
 **/__pycache__/
+**/.DS_Store
 *.py[oc]
 build/
 dist/
