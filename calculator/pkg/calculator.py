@@ -19,7 +19,7 @@ class Calculator:
     def evaluate(self, expression):
         if not expression or expression.isspace():
             return None
-        print(f"Calculator.evaluate with expression: '{expression}' ")
+        print(f">>> calling evaluate with expression: '{expression}' ")
         tokens = re.findall(r'\d+\.?\d*|\+|\-|\*|\/|\(|\)', expression)
         return self._evaluate_infix(tokens)
 

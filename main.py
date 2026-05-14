@@ -108,7 +108,12 @@ def main():
     # instantia gemini client
     client = genai.Client(api_key=api_key)
     if verbose:
-        print(f"client model list: {type(client.models.list())}")
+        model_list = client.models.list()
+        if hasattr(model_list, "models"):
+            model_list = model_list.models
+        else:
+            model_list = list(model_list)
+        print(f"client model list: {model_list}")
         
     messages = []
     while True:
@@ -122,7 +127,7 @@ def main():
             messages = []
             continue
         elif user_prompt_lowercase == "/help":
-            print("[agent] no help for")
+            print("[agent] /exit or /bye to exit, /clear to clear the conversation, /help for this message")
             print("\n")
             continue
             

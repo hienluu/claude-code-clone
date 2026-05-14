@@ -15,6 +15,39 @@ The agent operates on a linear execution loop:
 * Action: The tool is invoked, and the result is returned as an "observation."
 * Iteration: This process repeats until the task is complete or a predefined maximum iteration limit is reached to prevent infinite loops and token exhaustion.
 
+### Setup
+This project uses [uv](https://docs.astral.sh/uv/) for Python and dependency management. It requires Python 3.12+.
+
+1. Install `uv` (if you don't have it):
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
+   Or on macOS via Homebrew: `brew install uv`
+
+2. Clone the repo and `cd` into it:
+   ```bash
+   git clone <repo-url>
+   cd claude-code-clone
+   ```
+
+3. Install dependencies (this creates a `.venv` and installs everything from `pyproject.toml` / `uv.lock`):
+   ```bash
+   uv sync
+   ```
+
+4. Configure your API key:
+   ```bash
+   cp .env.sample .env
+   ```
+   Then edit `.env` and fill in your `GEMINI_API_KEY`.
+
+5. Run the agent:
+   ```bash
+   uv run main.py
+   ```
+
+`uv run` automatically uses the project's virtual environment, so you don't need to activate it manually.
+
 ### Getting started
 * Make a copy of .env.sample and name if .env
 * Fill in your GEMINI_API_KEY
