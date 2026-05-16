@@ -47,6 +47,7 @@ def agentic_loop(client: Client, model: str, messages:List[str], verbose: bool):
                 for i, candidate in enumerate(response.candidates): 
                     if verbose:
                         print(f"Response candidate content[{i}] ({candidate.content.role}): {candidate.content.parts[0].text} - {candidate.content}")
+                    #print(f">>> candidate.content: {type(candidate.content)}")
                     messages.append(candidate.content)
             
             function_call_response = []
@@ -58,6 +59,7 @@ def agentic_loop(client: Client, model: str, messages:List[str], verbose: bool):
                     function_response_content = call_function(function_call, verbose=verbose)
                     if verbose:
                         print(f"call_function response[{i}]: {function_response_content}")
+                    
                     messages.append(function_response_content)                    
             else:
                 print(f"Final response: {response.text}")
@@ -107,10 +109,12 @@ def print_messages(messages: List[types.Content]):
         elif role == "tool":
             content_parts = []
             for part in msg.parts:
+                #print(f">>> tool part: {part}")
                 if hasattr(part, 'function_response'):
                     fr = part.function_response
                     func_name = fr.name if hasattr(fr, 'name') else "unknown"
                     response_data = fr.response if hasattr(fr, 'response') else {}
+                    #print(f">>> tool response_data: {response_data}")
                     content_parts.append(f"[Tool Response: {func_name} -> {response_data}]")
                 elif hasattr(part, 'text') and part.text:
                     content_parts.append(part.text)
@@ -123,6 +127,7 @@ def print_messages(messages: List[types.Content]):
             text = (msg.parts[0].text or "(empty)") if msg.parts else "(empty)"
             preview = text[:100] + "..." if len(text) > 100 else text
             print(f"  {i}. [{role.upper()}]: {preview}")
+
 
 def main():
     load_dotenv()

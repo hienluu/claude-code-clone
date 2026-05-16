@@ -23,8 +23,9 @@ def evaluate(working_directory : str, expression:str="") -> str:
     Perform the evaluation of the given math expression
     """
     
-    print(f"evaluate with expression: {expression}")
+    #print(f"evaluate with expression: {expression}")
     calc = Calculator()
 
     result = calc.evaluate(expression)
-    print(f"evaluate with result: {result}")
+    #print(f"evaluate with result: {result}")
+    return result

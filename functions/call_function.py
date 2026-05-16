@@ -51,6 +51,7 @@ def call_function(function_call: types.FunctionCall, verbose=False) -> types.Con
     if function_name in function_registry:
         func = function_registry[function_name]()
         function_result = func(working_directory="./calculator", **function_args)
+        #print(f" call_function: {function_name} and result is {function_result}")
         return types.Content(
             role="tool",
             parts=[
