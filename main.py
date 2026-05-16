@@ -18,10 +18,13 @@ from functions.call_function import call_function
 
 MAX_ITERATIONS = 20
 
-def agentic_loop(client: Client, model: str, messages:List[str], verbose: bool):
+def agentic_loop(client: Client, model: str, user_prompt:str,  messages:List[str], verbose: bool):
     iteration = 0
     client_config = types.GenerateContentConfig(system_instruction=system_prompt,
                                                 tools=[available_functions])
+    
+    messages.append(types.Content(role="user", parts=[types.Part(text=user_prompt)])) 
+
     while iteration < MAX_ITERATIONS:
         try:
             response = client.models.generate_content(
@@ -30,25 +33,29 @@ def agentic_loop(client: Client, model: str, messages:List[str], verbose: bool):
                 config=client_config
             )
             
+            #messages.append(response.candidates[0].content)
+
             if verbose:                
                 print("=" * 100)
                 print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
                 print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
             
-            # determine if there are function calls in the response
-            if not response.function_calls and response:
-                # print the response and exit the loop
-                return f"Final Response:\n {response.text}"                
-                    
+
             # looping through response.candidaates
             if response.candidates:
                 if verbose:
                     print ("### response.candidates")
                 for i, candidate in enumerate(response.candidates): 
                     if verbose:
-                        print(f"Response candidate content[{i}] ({candidate.content.role}): {candidate.content.parts[0].text} - {candidate.content}")
-                    #print(f">>> candidate.content: {type(candidate.content)}")
+                        print(f"Response candidate content[{i}] ({candidate.content.role}): {candidate.content.parts[0].text} - {candidate.content}")                    
                     messages.append(candidate.content)
+            else:
+                print("response.candidates returned false") 
+
+            # determine if there are function calls in the response
+            if not response.function_calls and response:
+                # print the response and exit the loop
+                return f"Final Response:\n {response.text}"                                    
             
             function_call_response = []
             print("-" * 100)
@@ -189,11 +196,10 @@ def main():
             continue
             
         # perform action
-        print(f"action: {user_prompt}")
-        messages.append(types.Content(role="user", parts=[types.Part(text=user_prompt)]))        
+        #print(f"action: {user_prompt}")               
     
         # go into agentic loop
-        agent_response = agentic_loop(client, gemini_model, messages, verbose)        
+        agent_response = agentic_loop(client, gemini_model, user_prompt, messages, verbose)        
         
         # print agent out
         print(f"[agent] {agent_response}")
