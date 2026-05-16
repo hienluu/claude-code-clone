@@ -18,7 +18,7 @@ from functions.call_function import call_function
 
 MAX_ITERATIONS = 20
 
-def agentic_loop(client: Client, model: str, user_prompt: str, messages:List[str], verbose: bool):
+def agentic_loop(client: Client, model: str, messages:List[str], verbose: bool):
     iteration = 0
     client_config = types.GenerateContentConfig(system_instruction=system_prompt,
                                                 tools=[available_functions])
@@ -76,6 +76,54 @@ def print_banner():
     from banner import print_banner
     print_banner()
 
+def print_messages(messages: List[types.Content]):
+    if not messages:
+        print("[agent] No messages in conversation history")
+        return
+    print("[agent] Conversation history:")
+    for i, msg in enumerate(messages, 1):
+        role = msg.role
+
+        if role == "user":
+            text = (msg.parts[0].text or "(empty)") if msg.parts else "(empty)"
+            preview = text[:100] + "..." if len(text) > 100 else text
+            print(f"  {i}. [USER]: {preview}")
+
+        elif role == "model":
+            content_parts = []
+            for part in msg.parts:
+                if hasattr(part, 'text') and part.text:
+                    content_parts.append(part.text)
+                elif hasattr(part, 'function_call'):
+                    fc = part.function_call
+                    func_name = fc.name if hasattr(fc, 'name') else "unknown"
+                    args = fc.args if hasattr(fc, 'args') else {}
+                    content_parts.append(f"[Function: {func_name}({args})]")
+
+            content = " ".join(content_parts) if content_parts else "(empty)"
+            preview = content[:100] + "..." if len(content) > 100 else content
+            print(f"  {i}. [MODEL]: {preview}")
+
+        elif role == "tool":
+            content_parts = []
+            for part in msg.parts:
+                if hasattr(part, 'function_response'):
+                    fr = part.function_response
+                    func_name = fr.name if hasattr(fr, 'name') else "unknown"
+                    response_data = fr.response if hasattr(fr, 'response') else {}
+                    content_parts.append(f"[Tool Response: {func_name} -> {response_data}]")
+                elif hasattr(part, 'text') and part.text:
+                    content_parts.append(part.text)
+
+            content = " ".join(content_parts) if content_parts else "(empty)"
+            preview = content[:100] + "..." if len(content) > 100 else content
+            print(f"  {i}. [TOOL]: {preview}")
+
+        else:
+            text = (msg.parts[0].text or "(empty)") if msg.parts else "(empty)"
+            preview = text[:100] + "..." if len(text) > 100 else text
+            print(f"  {i}. [{role.upper()}]: {preview}")
+
 def main():
     load_dotenv()
     api_key = os.getenv("GEMINI_API_KEY")
@@ -120,14 +168,18 @@ def main():
         user_prompt = input("[user]: ")
         
         user_prompt_lowercase = user_prompt.lower()
-        if user_prompt_lowercase == "/exit" or user_prompt_lowercase == "/bye":
+        if user_prompt_lowercase in ["/exit", "/bye", "/quit"]:
             print("[agent] Goodbye!")
             break
         elif user_prompt_lowercase == "/clear":
             messages = []
             continue
         elif user_prompt_lowercase == "/help":
-            print("[agent] /exit or /bye to exit, /clear to clear the conversation, /help for this message")
+            print("[agent] /exit or /bye to exit, /clear to clear the conversation, /messages to view conversation history, /help for this message")
+            print("\n")
+            continue
+        elif user_prompt_lowercase == "/messages":
+            print_messages(messages)
             print("\n")
             continue
             
@@ -136,7 +188,7 @@ def main():
         messages.append(types.Content(role="user", parts=[types.Part(text=user_prompt)]))        
     
         # go into agentic loop
-        agent_response = agentic_loop(client, gemini_model, user_prompt, messages, verbose)        
+        agent_response = agentic_loop(client, gemini_model, messages, verbose)        
         
         # print agent out
         print(f"[agent] {agent_response}")
